@@ -58,4 +58,12 @@ public class CatalogDao {
         }
         return results.get(0);
     }
+
+    public CatalogItemVersion removeBookFromCatalog(String bookId) {
+        CatalogItemVersion inactiveVersion = getBookFromCatalog(bookId);
+
+        inactiveVersion.setInactive(true);
+        dynamoDbMapper.save(inactiveVersion);
+        return inactiveVersion;
+    }
 }
