@@ -22,7 +22,7 @@ import javax.inject.Inject;
  * This API allows the client to retrieve a book.
  */
 
-public class GetBookActivity {
+public class  GetBookActivity {
     private RecommendationsServiceClient recommendationServiceClient;
     private CatalogDao catalogDao;
 
