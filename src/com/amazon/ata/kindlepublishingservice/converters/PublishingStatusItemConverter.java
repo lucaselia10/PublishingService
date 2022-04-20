@@ -1,6 +1,7 @@
 package com.amazon.ata.kindlepublishingservice.converters;
 
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.PublishingStatusItem;
+import com.amazon.ata.kindlepublishingservice.enums.PublishingRecordStatus;
 import com.amazon.ata.kindlepublishingservice.models.PublishingStatusRecord;
 
 import java.util.ArrayList;
