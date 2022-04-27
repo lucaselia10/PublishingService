@@ -8,25 +8,31 @@ import java.util.Queue;
 
 public class BookPublishRequestManager {
 
-    private CatalogDao catalogDao;
+//    private CatalogDao catalogDao;
+    private Queue<BookPublishRequest> bookQueue;
 
+    // had a CatalogDao in here but I dont need it
     @Inject
-    public BookPublishRequestManager(CatalogDao catalogDao) {
-        this.catalogDao = catalogDao;
+    public BookPublishRequestManager(Queue<BookPublishRequest> bookQueue) {
+//        this.catalogDao = catalogDao;
+        this.bookQueue = bookQueue;
+
     }
 
-    public Queue<BookPublishRequest> addBookPublishRequest(BookPublishRequest bookPublishRequest) {
 
-        Queue<BookPublishRequest> bookQueue = new LinkedList<>();
+    //         replaced return of Queue<BookPublishRequest> with void
+    public void addBookPublishRequest(BookPublishRequest bookPublishRequest) {
+
+        bookQueue = new LinkedList<>();
         bookQueue.add(bookPublishRequest);
-        return bookQueue;
+//        return bookQueue;
     }
-    public BookPublishRequest getBookPublishRequestToProcess(Queue<BookPublishRequest> bookPublishRequestQueue) {
-        if (bookPublishRequestQueue.isEmpty()) {
+    public BookPublishRequest getBookPublishRequestToProcess() {
+        if (bookQueue.isEmpty()) {
             return null;
         }
 
-       return bookPublishRequestQueue.remove();
+       return bookQueue.remove();
     }
 
 

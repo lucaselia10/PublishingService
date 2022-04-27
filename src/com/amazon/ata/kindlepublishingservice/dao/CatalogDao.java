@@ -9,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.channels.ScatteringByteChannel;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -76,6 +77,40 @@ public class CatalogDao {
         if (book == null) {
             throw new BookNotFoundException(String.format("no book found for id: %s", bookId));
         }
+
+    }
+
+    public CatalogItemVersion createOrUpdateBook(KindleFormattedBook kindleFormattedBook) {
+        if (getLatestVersionOfBook(kindleFormattedBook.getBookId()) == null) {
+
+            String bookId = KindlePublishingUtils.generateBookId();
+            CatalogItemVersion catalogItemVersion = new CatalogItemVersion();
+            catalogItemVersion.setBookId(bookId);
+            catalogItemVersion.setVersion(1);
+            catalogItemVersion.setInactive(false);
+            catalogItemVersion.setTitle(kindleFormattedBook.getTitle());
+            catalogItemVersion.setAuthor(kindleFormattedBook.getAuthor());
+            catalogItemVersion.setText(kindleFormattedBook.getText());
+            catalogItemVersion.setGenre(kindleFormattedBook.getGenre());
+            dynamoDbMapper.save(catalogItemVersion);
+        }
+        getBookFromCatalog(kindleFormattedBook.getBookId());
+
+        CatalogItemVersion inactiveVersion = removeBookFromCatalog(kindleFormattedBook.getBookId());
+        CatalogItemVersion catalogItem = new CatalogItemVersion();
+
+        catalogItem.setBookId(inactiveVersion.getBookId());
+        catalogItem.setVersion(inactiveVersion.getVersion() + 1);
+        catalogItem.setInactive(false);
+        catalogItem.setTitle(inactiveVersion.getTitle());
+        catalogItem.setAuthor(inactiveVersion.getAuthor());
+        catalogItem.setText(inactiveVersion.getText());
+        catalogItem.setGenre(inactiveVersion.getGenre());
+        dynamoDbMapper.save(catalogItem);
+
+        return catalogItem;
+
+
 
     }
 }
