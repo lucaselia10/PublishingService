@@ -4,14 +4,11 @@ import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion
 import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
 import com.amazon.ata.kindlepublishingservice.publishing.KindleFormattedBook;
 import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import org.apache.commons.lang3.StringUtils;
 
-import java.nio.channels.ScatteringByteChannel;
-import java.util.List;
 import javax.inject.Inject;
+import java.util.List;
 
 public class CatalogDao {
 
@@ -81,7 +78,7 @@ public class CatalogDao {
     }
 
     public CatalogItemVersion createOrUpdateBook(KindleFormattedBook kindleFormattedBook) {
-        if (getLatestVersionOfBook(kindleFormattedBook.getBookId()) == null) {
+        if  (kindleFormattedBook.getBookId() == null) {
 
             String bookId = KindlePublishingUtils.generateBookId();
             CatalogItemVersion catalogItemVersion = new CatalogItemVersion();
@@ -94,23 +91,25 @@ public class CatalogDao {
             catalogItemVersion.setGenre(kindleFormattedBook.getGenre());
             dynamoDbMapper.save(catalogItemVersion);
         }
-        getBookFromCatalog(kindleFormattedBook.getBookId());
 
-        CatalogItemVersion inactiveVersion = removeBookFromCatalog(kindleFormattedBook.getBookId());
-        CatalogItemVersion catalogItem = new CatalogItemVersion();
+        if(getBookFromCatalog(kindleFormattedBook.getBookId()) == null) {
+            throw new BookNotFoundException("Book not found!");
+        }
+            CatalogItemVersion inactiveVersion = getBookFromCatalog(kindleFormattedBook.getBookId());
+            CatalogItemVersion catalogItem = new CatalogItemVersion();
+            catalogItem.setBookId(inactiveVersion.getBookId());
+            catalogItem.setVersion(inactiveVersion.getVersion() + 1);
+            catalogItem.setInactive(false);
+            catalogItem.setTitle(inactiveVersion.getTitle());
+            catalogItem.setAuthor(inactiveVersion.getAuthor());
+            catalogItem.setText(inactiveVersion.getText());
+            catalogItem.setGenre(inactiveVersion.getGenre());
+            dynamoDbMapper.save(catalogItem);
 
-        catalogItem.setBookId(inactiveVersion.getBookId());
-        catalogItem.setVersion(inactiveVersion.getVersion() + 1);
-        catalogItem.setInactive(false);
-        catalogItem.setTitle(inactiveVersion.getTitle());
-        catalogItem.setAuthor(inactiveVersion.getAuthor());
-        catalogItem.setText(inactiveVersion.getText());
-        catalogItem.setGenre(inactiveVersion.getGenre());
-        dynamoDbMapper.save(catalogItem);
+            inactiveVersion.setInactive(true);
+            dynamoDbMapper.save(inactiveVersion);
 
-        return catalogItem;
-
-
+            return catalogItem;
 
     }
 }

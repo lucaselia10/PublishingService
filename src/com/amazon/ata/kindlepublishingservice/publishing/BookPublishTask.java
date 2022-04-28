@@ -34,13 +34,9 @@ public class BookPublishTask implements Runnable {
         }
         catch (BookNotFoundException e) {
             publishingStatusDao.setPublishingStatus(request.getPublishingRecordId(), PublishingRecordStatus.FAILED, request.getBookId(), String.format("No book found for id: %s", request.getBookId()));
+            return;
         }
 
-        try {
             publishingStatusDao.setPublishingStatus(request.getPublishingRecordId(), PublishingRecordStatus.SUCCESSFUL, request.getBookId());
-        }
-        catch (Exception e) {
-            publishingStatusDao.setPublishingStatus(request.getPublishingRecordId(), PublishingRecordStatus.FAILED, request.getBookId(), e.getMessage());
-        }
     }
 }
