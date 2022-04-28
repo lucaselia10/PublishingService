@@ -7,7 +7,6 @@ import dagger.Module;
 import dagger.Provides;
 
 import javax.inject.Singleton;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
