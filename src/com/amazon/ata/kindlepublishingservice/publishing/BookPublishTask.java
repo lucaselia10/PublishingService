@@ -19,7 +19,7 @@ public class BookPublishTask implements Runnable {
         this.publishingStatusDao = publishingStatusDao;
         this.catalogDao = catalogDao;
     }
-    @Override
+
     public void run() {
 
         BookPublishRequest request = bookPublishRequestManager.getBookPublishRequestToProcess();

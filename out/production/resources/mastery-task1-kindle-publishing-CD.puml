@@ -1,0 +1,71 @@
+@startuml
+
+class GetBookActivity {
+- RecommendationsServiceClient : recommendationServiceClient
+- CatalogDAO : catalogDao
++ execute(GetBookRequest) : GetBookResponse
+}
+
+class GetPublishingStatusActivity {
++ execute(GetPublishingStatusRequest)
+}
+
+class RemoveBookFromCatologActivity {
++ execute(RemoveFromCatalogRequest)
+}
+
+class SubmitBookForPublishingActivity {
+- PublishingStatusDAO : publishingstatusDao
++ execute(SubmitBookForPublishingRequest) : SubmitBookForPublishingResponse
+}
+
+class RecommendationsServiceClient {
+- RecommendationsService : recommedationsService
++ getBookRecommendations(BookGenre) : List<BookRecommendation>
+}
+
+class CatalogDAO {
+- DynamoDBMapper : dynamoDbMapper
++ getBookFromCatalog(String) : CatalogItemVersion
++ getLatestVersionOfBook(String) : CatalogItemVersion
+}
+
+class PublishingStatusDao  {
+- String
+- DynamoDBMapper : dynamoDbMapper
++ setPublishingStatus(String, PublishingRecordStatus, String) : PublishingStatusItem
++ setPublishingStatus(String, PublishingRecordStatus, String, String) : PublishingStatusItem
+}
+
+class CatalogItemVersion {
+- @DynamoDbHashKey bookId : String
+- @DynamoDbRangeKey version : int
+- boolean : inactive
+- String : title
+- String : author
+- String : text
+- DynamoDbTypeConvertedEnum genre : BookGenre
+}
+
+class PublishingStatusItem {
+- @DynamoDbHashKey publishingRecordId : String
+- @DynamoDbRangeKey @DynamoDbtyoeConvertedEnum status : PublishingRecordStatus
+- String : statusMessage
+- String : bookId
+}
+
+class BookNotFoundException {
+- long : serialVersionUID
+}
+
+class PublishingStatusNotFoundException {
+- long : serialVersionUID
+}
+
+GetBookActivity <|.. CatalogDAO
+GetBookActivity <|.. RecommendationsServiceClient
+SubmitBookForPublishingActivity <|.. PublishingStatusDAO
+
+
+
+@enduml
