@@ -88,6 +88,7 @@ public class PublishingStatusDao {
                 .withHashKeyValues(item);
 
         PaginatedQueryList<PublishingStatusItem> publishingStatusItems = dynamoDbMapper.query(PublishingStatusItem.class, query);
+
         if (publishingStatusItems.isEmpty()) {
             throw new PublishingStatusNotFoundException(String.format("No publishing status found for id: %s", publishingRecordId));
         }

@@ -5,8 +5,10 @@ import com.amazon.ata.kindlepublishingservice.models.Book;
 import java.util.Objects;
 
 public class RemoveBookFromCatalogResponse {
-
     private Book book;
+
+    public RemoveBookFromCatalogResponse() {}
+
     public RemoveBookFromCatalogResponse(Book book) {
         this.book = book;
     }

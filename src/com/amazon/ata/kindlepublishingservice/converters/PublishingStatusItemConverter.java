@@ -1,28 +1,34 @@
 package com.amazon.ata.kindlepublishingservice.converters;
 
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.PublishingStatusItem;
-import com.amazon.ata.kindlepublishingservice.enums.PublishingRecordStatus;
 import com.amazon.ata.kindlepublishingservice.models.PublishingStatusRecord;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class PublishingStatusItemConverter {
 
     private PublishingStatusItemConverter() {}
 
-    public static List<PublishingStatusRecord> convert(List<PublishingStatusItem> publishingStatusItems) {
-        List<PublishingStatusRecord> publishingStatusRecordList = new LinkedList<>();
 
-        for (PublishingStatusItem item : publishingStatusItems) {
-            PublishingStatusRecord record = new PublishingStatusRecord();
-            record.setStatus(String.valueOf(item.getStatus()));
-            record.setStatusMessage(item.getStatusMessage());
-            record.setBookId(item.getBookId());
+    // Used to return List<PublishingStatusRecord> and take in List<PublishingStatusItem>
+    public static PublishingStatusRecord toPublishingStatus(PublishingStatusItem statusItem) {
 
-            publishingStatusRecordList.add(record);
+        return PublishingStatusRecord.builder()
+                .withBookId(statusItem.getBookId())
+                .withStatus(String.valueOf(statusItem.getStatus()))
+                .withStatusMessage(statusItem.getStatusMessage())
+                .build();
+    }
+
+    public static List<PublishingStatusRecord> toPublishingStatusList(List<PublishingStatusItem> statusItems) {
+
+        List<PublishingStatusRecord> publishingStatusList = new ArrayList<>();
+
+        for (PublishingStatusItem item : statusItems) {
+            publishingStatusList.add(toPublishingStatus(item));
         }
-        return publishingStatusRecordList;
+
+        return publishingStatusList;
     }
 }

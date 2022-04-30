@@ -27,6 +27,7 @@ public class CatalogDao {
     /**
      * Returns the latest version of the book from the catalog corresponding to the specified book id.
      * Throws a BookNotFoundException if the latest version is not active or no version is found.
+     *
      * @param bookId Id associated with the book.
      * @return The corresponding CatalogItem from the catalog table.
      */
@@ -36,7 +37,7 @@ public class CatalogDao {
         // Removed a check in the if statement to see if the book is inactive
         // check threw an exception if the book was inactive
         // had to remove for Mastery Task 2 Tests to pass
-        if (book == null) {
+        if (book == null || book.isInactive()) {
             throw new BookNotFoundException(String.format("No book found for id: %s", bookId));
         }
 
@@ -49,9 +50,9 @@ public class CatalogDao {
         book.setBookId(bookId);
 
         DynamoDBQueryExpression<CatalogItemVersion> queryExpression = new DynamoDBQueryExpression()
-            .withHashKeyValues(book)
-            .withScanIndexForward(false)
-            .withLimit(1);
+                .withHashKeyValues(book)
+                .withScanIndexForward(false)
+                .withLimit(1);
 
         List<CatalogItemVersion> results = dynamoDbMapper.query(CatalogItemVersion.class, queryExpression);
         if (results.isEmpty()) {
@@ -78,38 +79,35 @@ public class CatalogDao {
     }
 
     public CatalogItemVersion createOrUpdateBook(KindleFormattedBook kindleFormattedBook) {
-        if  (kindleFormattedBook.getBookId() == null) {
-
-            String bookId = KindlePublishingUtils.generateBookId();
+        if (kindleFormattedBook.getBookId() == null) {
             CatalogItemVersion catalogItemVersion = new CatalogItemVersion();
-            catalogItemVersion.setBookId(bookId);
+            catalogItemVersion.setBookId(KindlePublishingUtils.generateBookId());
             catalogItemVersion.setVersion(1);
-            catalogItemVersion.setInactive(false);
             catalogItemVersion.setTitle(kindleFormattedBook.getTitle());
             catalogItemVersion.setAuthor(kindleFormattedBook.getAuthor());
             catalogItemVersion.setText(kindleFormattedBook.getText());
             catalogItemVersion.setGenre(kindleFormattedBook.getGenre());
             dynamoDbMapper.save(catalogItemVersion);
+            return catalogItemVersion;
+        } else {
+
+            if (getLatestVersionOfBook(kindleFormattedBook.getBookId()) == null) {
+                throw new BookNotFoundException(String.format("Book not found for id: %s", kindleFormattedBook.getBookId()));
+            }
+            CatalogItemVersion versionUpdate = getLatestVersionOfBook(kindleFormattedBook.getBookId());
+            removeBookFromCatalog(versionUpdate.getBookId());
+
+            versionUpdate.setBookId(versionUpdate.getBookId());
+            versionUpdate.setVersion(versionUpdate.getVersion() + 1);
+            versionUpdate.setAuthor(versionUpdate.getAuthor());
+            versionUpdate.setGenre(versionUpdate.getGenre());
+            versionUpdate.setInactive(false);
+            versionUpdate.setText(versionUpdate.getText());
+            versionUpdate.setTitle(versionUpdate.getTitle());
+            dynamoDbMapper.save(versionUpdate);
+
+            return versionUpdate;
+
         }
-
-        if(getBookFromCatalog(kindleFormattedBook.getBookId()) == null) {
-            throw new BookNotFoundException("Book not found!");
-        }
-            CatalogItemVersion inactiveVersion = getBookFromCatalog(kindleFormattedBook.getBookId());
-            CatalogItemVersion catalogItem = new CatalogItemVersion();
-            catalogItem.setBookId(inactiveVersion.getBookId());
-            catalogItem.setVersion(inactiveVersion.getVersion() + 1);
-            catalogItem.setInactive(false);
-            catalogItem.setTitle(inactiveVersion.getTitle());
-            catalogItem.setAuthor(inactiveVersion.getAuthor());
-            catalogItem.setText(inactiveVersion.getText());
-            catalogItem.setGenre(inactiveVersion.getGenre());
-            dynamoDbMapper.save(catalogItem);
-
-            inactiveVersion.setInactive(true);
-            dynamoDbMapper.save(inactiveVersion);
-
-            return catalogItem;
-
     }
 }

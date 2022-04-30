@@ -7,8 +7,6 @@ public class PublishingStatusRecord {
     private String statusMessage;
     private String bookId;
 
-    public PublishingStatusRecord() {}
-
     public PublishingStatusRecord(String status, String statusMessage, String bookId) {
         this.status = status;
         this.statusMessage = statusMessage;

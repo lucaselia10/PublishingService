@@ -18,10 +18,8 @@ public class RemoveBookFromCatalogActivity {
         this.catalogDao = catalogDao;
     }
 
-    public RemoveBookFromCatalogResponse execute(RemoveBookFromCatalogRequest removeBookFromCatalogRequest) {
-        CatalogItemVersion catalogItem = catalogDao.removeBookFromCatalog(removeBookFromCatalogRequest.getBookId());
-        return RemoveBookFromCatalogResponse.builder()
-                .withBook(CatalogItemConverter.toBook(catalogItem))
-                .build();
+    public RemoveBookFromCatalogResponse execute(final RemoveBookFromCatalogRequest removeBookFromCatalogRequest) {
+        catalogDao.removeBookFromCatalog(removeBookFromCatalogRequest.getBookId());
+        return new RemoveBookFromCatalogResponse();
     }
 }

@@ -1,5 +1,6 @@
 package com.amazon.ata.kindlepublishingservice.dagger;
 
+import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
 import com.amazon.ata.kindlepublishingservice.publishing.BookPublisher;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +35,7 @@ public class ATAKindlePublishingServiceManager {
     public void verify() throws Exception {
     }
 
-    public void start() throws Exception {
+    public void start() throws BookNotFoundException {
         bookPublisher.start();
     }
 

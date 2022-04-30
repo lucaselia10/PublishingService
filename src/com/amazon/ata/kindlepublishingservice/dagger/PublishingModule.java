@@ -6,10 +6,10 @@ import com.amazon.ata.kindlepublishingservice.publishing.BookPublisher;
 import dagger.Module;
 import dagger.Provides;
 
-import javax.inject.Singleton;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import javax.inject.Singleton;
 
 @Module
 public class PublishingModule {
@@ -23,7 +23,8 @@ public class PublishingModule {
     @Provides
     @Singleton
     public ScheduledExecutorService provideBookPublisherScheduler() {
-        return Executors.newScheduledThreadPool(1);
+
+        return Executors.newScheduledThreadPool(4);
     }
 
     @Provides
